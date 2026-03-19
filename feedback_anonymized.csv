@@ -1,0 +1,136 @@
+course_title,responses,id_recommend_this_course_to_others_numeric_min,id_recommend_this_course_to_others_numeric_max,id_recommend_this_course_to_others_numeric_median,id_recommend_this_course_to_others_numeric_mean,my_instructor_was_an_effective_and_engaging_facilitator_of_learning_numeric_min,my_instructor_was_an_effective_and_engaging_facilitator_of_learning_numeric_max,my_instructor_was_an_effective_and_engaging_facilitator_of_learning_numeric_median,my_instructor_was_an_effective_and_engaging_facilitator_of_learning_numeric_mean,the_course_materials_and_assignments_helped_me_acquire_new_knowledge_and_skills_numeric_min,the_course_materials_and_assignments_helped_me_acquire_new_knowledge_and_skills_numeric_max,the_course_materials_and_assignments_helped_me_acquire_new_knowledge_and_skills_numeric_median,the_course_materials_and_assignments_helped_me_acquire_new_knowledge_and_skills_numeric_mean,taking_this_course_will_improve_my_job_performance_numeric_min,taking_this_course_will_improve_my_job_performance_numeric_max,taking_this_course_will_improve_my_job_performance_numeric_median,taking_this_course_will_improve_my_job_performance_numeric_mean,total_learners,org_vertical,organization,calendar_month,response_pct,level,persona,first_run_section
+Advancing Effective Project Management Practices,15,2,5,4,3.8,3,5,4,4,2,5,4,3.4,2,5,4,3.533333333333333,15,Defense & Manufacturing,Organization 2,2025-04,1,Introductory,Data Consumer,1
+Advancing Effective Project Management Practices,24,3,5,4,4.083333333333333,3,5,4,4.291666666666667,2,5,4,4.083333333333333,3,5,4,4.041666666666667,26,Legal,Organization 20,2025-10,0.923,Introductory,Data Consumer,1
+Advancing Effective Project Management Practices,16,2,5,4.5,4.3125,4,5,5,4.6875,4,5,4,4.4375,3,5,4,4.375,19,Professional Services,Organization 23,2025-01,0.842,Introductory,Data Consumer,1
+Building Predictive and Prescriptive AI Data Models,16,4,5,5,4.625,4,5,5,4.75,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,19,Financial Services,Organization 1,2025-07,0.842,Advanced,Data Practitioner,1
+Building Predictive and Prescriptive AI Data Models,2,4,5,4.5,4.5,5,5,5,5,3,5,4,4,3,5,4,4,8,Financial Services,Organization 25,2026-02,0.25,Advanced,Data Practitioner,1
+Building Predictive and Prescriptive AI Data Models,4,3,5,3.5,3.75,4,5,4.5,4.5,3,5,4.5,4.25,3,5,4,4,8,Financial Services,Organization 25,2026-02,0.5,Advanced,Data Practitioner,1
+Communicating Effectively with Data Visualizations,18,2,5,4,3.9444444444444446,3,5,5,4.5,2,5,4,4.222222222222222,1,5,4,3.5,29,Financial Services,Organization 1,2025-10,0.621,Introductory,Data Consumer,0
+Communicating Effectively with Data Visualizations,21,1,5,3,3.047619047619047,2,5,4,4.238095238095238,1,5,3,3.238095238095238,1,5,3,2.8095238095238093,25,Financial Services,Organization 1,2025-12,0.84,Introductory,Data Consumer,0
+Communicating Effectively with Data Visualizations,4,3,5,4,4,4,5,4.5,4.5,3,5,4,4,4,5,4,4.25,5,Financial Services,Organization 1,2026-02,0.8,Introductory,Data Consumer,0
+Communicating Effectively with Data Visualizations,20,1,5,4,3.65,3,5,4,4.25,1,5,4,3.8,1,5,4,3.45,23,Financial Services,Organization 1,2025-04,0.87,Introductory,Data Consumer,1
+Communication and Visualization for Data Analytics,11,3,5,5,4.545454545454546,4,5,4,4.363636363636363,4,5,5,4.636363636363637,3,5,5,4.545454545454546,22,Financial Services,Organization 1,2024-03,0.5,Introductory,Data Consumer,1
+Cultivating Data Driven Decision-Making,24,3,5,4,4.125,3,5,4,4.375,3,5,4,4.291666666666667,2,5,4,4.208333333333333,25,Legal,Organization 20,2025-11,0.96,Introductory,Leadership,1
+Data Ethics,62,1,5,4,3.870967741935484,2,5,4,4.161290322580645,1,5,4,3.9193548387096775,Inf,#NAME?,NA,NA,70,Financial Services,Organization 1,2026-03,0.886,Introductory,Data Consumer,1
+Developing an Organizational Data Strategy,7,3,5,5,4.571428571428571,3,5,5,4.714285714285714,3,5,5,4.428571428571429,2,5,4,4.142857142857143,13,Financial Services,Organization 1,2025-05,0.538,Advanced,Leadership,1
+Developing an Organizational Data Strategy,4,5,5,5,5,4,5,5,4.75,4,5,4,4.333333333333333,4,4,4,4,10,Financial Services,Organization 1,2025-05,0.4,Advanced,Leadership,1
+Empowering Self-Service Data Warehouse Access with SQL,14,3,5,5,4.642857142857143,4,5,5,4.714285714285714,3,5,5,4.571428571428571,2,5,5,4.428571428571429,17,Financial Services,Organization 1,2025-02,0.824,Advanced,Data Practitioner,1
+Enhancing Decision Making with Analytics,27,1,5,4,4,3,5,4,4.296296296296297,2,5,4,4,2,5,4,3.592592592592593,27,Financial Services,Organization 1,2026-01,1,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,18,1,5,4,3.611111111111111,1,5,4,4.055555555555555,3,5,4,3.888888888888889,3,5,4,3.6666666666666665,20,Financial Services,Organization 1,2025-10,0.9,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,22,3,5,4.5,4.318181818181818,3,5,5,4.681818181818182,3,5,4,4.2727272727272725,2,5,4,3.909090909090909,23,Financial Services,Organization 1,2025-10,0.957,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,18,2,5,4,3.9444444444444446,3,5,5,4.611111111111111,2,5,4,3.9444444444444446,2,5,4,3.888888888888889,20,Financial Services,Organization 1,2025-10,0.9,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,26,3,5,4,4.1923076923076925,3,5,5,4.653846153846154,2,5,4,4.1923076923076925,2,5,4,3.923076923076923,29,Financial Services,Organization 1,2025-11,0.897,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,19,3,5,4,4.315789473684211,4,5,5,4.7368421052631575,3,5,4,4.315789473684211,3,5,4,4.105263157894737,20,Financial Services,Organization 1,2025-11,0.95,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,11,3,5,4,4.181818181818182,4,5,4,4.363636363636363,4,5,4,4.363636363636363,3,5,4,4,12,Financial Services,Organization 1,2024-12,0.917,Introductory,Leadership,1
+Enhancing Decision Making with Analytics,30,3,5,4,3.7666666666666666,3,5,4,4.233333333333333,2,5,4,3.7333333333333334,2,5,3.5,3.533333333333333,34,Financial Services,Organization 1,2026-02,0.882,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,38,1,5,4,3.5526315789473686,3,5,4,4.184210526315789,1,5,4,3.6842105263157894,1,5,3.5,3.3684210526315788,44,Financial Services,Organization 1,2026-03,0.864,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,23,3,5,4,4.3478260869565215,4,5,5,4.608695652173913,4,5,4,4.434782608695652,3,5,4,4.304347826086956,25,Financial Services,Organization 1,2025-05,0.92,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,23,3,5,5,4.478260869565218,4,5,5,4.6521739130434785,3,5,5,4.434782608695652,3,5,4,4.260869565217392,30,Financial Services,Organization 1,2025-06,0.767,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,16,2,5,4,3.6875,3,5,4,4.1875,2,5,4,3.8125,2,5,3,3.375,20,Financial Services,Organization 1,2025-07,0.8,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,22,3,5,5,4.5,4,5,5,4.863636363636363,3,5,4.5,4.409090909090909,3,5,4,4.2272727272727275,22,Financial Services,Organization 1,2025-07,1,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,15,2,5,4,3.7333333333333334,3,5,4,4.066666666666666,2,5,4,3.8,1,5,4,3.533333333333333,20,Financial Services,Organization 1,2025-08,0.75,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,16,3,5,4,4.0625,4,5,4,4.3125,3,5,4,4.1875,3,5,4,3.9375,22,Financial Services,Organization 1,2025-09,0.727,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,25,2,5,4,4.24,3,5,5,4.56,2,5,4,4.28,3,5,4,4,30,Financial Services,Organization 1,2025-09,0.833,Introductory,Leadership,0
+Enhancing Decision Making with Analytics,22,3,5,4,4.2727272727272725,3,5,5,4.681818181818182,3,5,4,4.2272727272727275,2,5,4,3.9545454545454546,30,Financial Services,Organization 1,2025-09,0.733,Introductory,Leadership,0
+Essential AI for Leaders,11,4,5,5,4.636363636363637,4,5,5,4.818181818181818,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,15,Professional Services,Organization 4,2025-04,0.733,Introductory,Leadership,1
+Essential AI for Leaders,5,3,5,5,4.4,4,5,5,4.6,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,25,Life Sciences,Organization 5,2025-06,0.2,Introductory,Leadership,1
+Essential AI for Leaders,22,3,5,4,4.136363636363637,3,5,4,4.2272727272727275,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,40,Life Sciences,Organization 5,2025-07,0.55,Introductory,Leadership,0
+Establishing RAI Governance and Data Ethics,10,4,5,5,4.6,4,5,5,4.8,3,5,4,4.1,3,5,4,4,11,Financial Services,Organization 1,2025-11,0.909,Advanced,Leadership,1
+Establishing RAI Governance and Data Ethics,15,3,5,4,4.333333333333333,3,5,5,4.6,3,5,4,4.066666666666666,3,5,4,3.8666666666666663,18,Financial Services,Organization 1,2025-11,0.833,Advanced,Leadership,1
+Evaluating AI Opportunities,8,4,5,4,4.375,4,5,4.5,4.5,4,4,4,4,3,4,4,3.75,24,Financial Services,Organization 1,2026-02,0.333,Introductory,Leadership,1
+Evaluating AI Opportunities,2,5,5,5,5,5,5,5,5,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,16,Professional Services,Organization 4,2025-04,0.125,Introductory,Leadership,1
+Evaluating AI Opportunities,2,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,9,Life Sciences,Organization 5,2025-08,0.222,Introductory,Leadership,1
+Evaluating AI Opportunities,5,4,4,4,4,4,4,4,4,Inf,#NAME?,NA,NA,Inf,#NAME?,NA,NA,9,Life Sciences,Organization 5,2025-08,0.556,Introductory,Leadership,1
+Evaluating AI Opportunities,8,4,5,5,4.625,4,5,5,4.875,4,5,4.5,4.5,2,5,4,4.125,20,Education,Organization 6,2025-12,0.4,Introductory,Leadership,1
+Evaluating AI Opportunities,8,4,5,4,4.375,4,5,5,4.625,3,5,4,4.125,3,5,3.5,3.625,8,Financial Services,Organization 13,2025-02,1,Introductory,Leadership,1
+Foundations in AI,43,3,5,5,4.488372093023256,4,5,5,4.883720930232558,2,5,5,4.488372093023256,2,5,4,4,43,Financial Services,Organization 1,2024-06,1,Introductory,Data Consumer,1
+Foundations in AI,38,3,5,5,4.7105263157894735,4,5,5,4.7894736842105265,4,5,5,4.7368421052631575,3,5,4,4.184210526315789,49,Financial Services,Organization 1,2024-06,0.776,Introductory,Data Consumer,1
+Foundations in AI,16,4,5,4,4.375,4,5,5,4.625,2,5,4,4.3125,2,5,4,3.9375,17,Financial Services,Organization 13,2025-01,0.941,Introductory,Data Consumer,0
+Foundations in AI,9,4,5,4,4.333333333333333,4,5,5,4.888888888888889,3,5,5,4.555555555555555,4,5,4,4.333333333333333,9,Financial Services,Organization 13,2024-11,1,Introductory,Data Consumer,1
+Foundations in AI,6,3,5,4,4,4,5,5,4.833333333333333,3,5,4.5,4.166666666666667,2,5,3.5,3.5,7,Professional Services,Organization 30,2024-08,0.857,Introductory,Data Consumer,1
+Foundations in Python for Scaling Data Analysis,18,2,5,4,4.222222222222222,2,5,5,4.555555555555555,4,5,4.5,4.5,3,5,4,4.277777777777778,20,Financial Services,Organization 1,2024-12,0.9,Advanced,Data Practitioner,1
+Foundations in Python for Scaling Data Analysis,10,4,5,5,4.8,4,5,5,4.8,3,5,5,4.6,2,5,5,4.1,14,Financial Services,Organization 1,2025-04,0.714,Advanced,Data Practitioner,0
+Foundations in Python for Scaling Data Analysis,10,3,5,4,4.2,4,5,5,4.7,4,5,4.5,4.5,3,5,4,4.2,10,Financial Services,Organization 25,2025-06,1,Advanced,Data Practitioner,1
+Foundations of Project Management,32,3,5,5,4.40625,3,5,5,4.5,2,5,5,4.4375,3,5,4.5,4.375,35,Professional Services,Organization 4,2024-11,0.914,Introductory,Data Consumer,0
+Foundations of Project Management,16,3,5,4,4.1875,3,5,4.5,4.375,3,5,4,4.25,3,5,4,3.9375,19,Professional Services,Organization 4,2025-03,0.842,Introductory,Data Consumer,0
+Foundations of Project Management,26,1,5,5,4.615384615384615,3,5,5,4.8076923076923075,2,5,5,4.653846153846154,2,5,5,4.538461538461538,28,Professional Services,Organization 4,2024-04,0.929,Introductory,Data Consumer,1
+Generative AI: An Assistant for Exploratory Data Analysis,10,3,5,4,4.1,4,5,4.5,4.5,3,5,4.5,4.3,2,5,4,4.1,11,Financial Services,Organization 28,2024-02,0.909,Introductory,Data Practitioner,1
+Identifying AI Opportunities,14,4,5,4,4.428571428571429,4,5,5,4.642857142857143,3,5,4,4.142857142857143,3,5,4,4,18,Education,Organization 6,2025-12,0.778,Introductory,Leadership,1
+Ensuring Data Quality & Compliance Through Governance,16,3,5,4.5,4.4375,4,5,5,4.625,3,5,4.5,4.4375,3,5,4,4.1875,17,Financial Services,Organization 1,2025-12,0.941,Advanced,Data Curator,1
+Introduction to Machine Learning for Materials Scientists,13,3,5,5,4.461538461538462,3,5,5,4.384615384615385,3,5,5,4.461538461538462,3,5,4,4,16,Life Sciences,Organization 10,2024-03,0.812,Advanced,Data Practitioner,1
+Maximizing Productivity with Generative AI,13,3,5,5,4.6923076923076925,4,5,5,4.769230769230769,3,5,5,4.538461538461538,3,5,5,4.461538461538462,13,Financial Services,Organization 1,2026-01,1,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,32,3,5,5,4.53125,4,5,5,4.8125,3,5,4,4.375,3,5,4,4.125,33,Financial Services,Organization 1,2024-10,0.97,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,31,3,5,4,4.419354838709677,4,5,5,4.709677419354839,2,5,4,4.233333333333333,2,5,4,3.966666666666667,35,Financial Services,Organization 1,2025-10,0.886,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,25,4,5,5,4.76,4,5,5,4.92,2,5,5,4.52,2,5,4,4.28,28,Financial Services,Organization 1,2024-10,0.893,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,31,4,5,5,4.645161290322581,4,5,5,4.935483870967742,3,5,5,4.548387096774194,3,5,5,4.419354838709677,35,Financial Services,Organization 1,2024-10,0.886,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,32,4,5,5,4.53125,4,5,5,4.75,3,5,5,4.53125,3,5,4,4.15625,34,Financial Services,Organization 1,2024-10,0.941,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,31,3,5,5,4.612903225806452,4,5,5,4.935483870967742,3,5,5,4.677419355,3,5,5,4.516129032258065,37,Financial Services,Organization 1,2024-10,0.838,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,21,2,5,4,3.9047619047619047,3,5,5,4.476190476190476,2,5,4,3.9047619047619047,2,5,4,3.619047619047619,23,Financial Services,Organization 1,2025-11,0.913,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,23,2,5,4,3.9565217391304346,4,5,5,4.608695652173913,2,5,4,3.9565217391304346,2,5,4,3.869565217391304,28,Financial Services,Organization 1,2025-12,0.821,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,30,2,5,5,4.466666666666667,4,5,5,4.8,3,5,5,4.482758620689655,3,5,4,4.310344827586207,52,Financial Services,Organization 1,2026-02,0.577,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,4,4,5,5,4.75,4,5,5,4.75,4,5,4.5,4.5,3,4,4,3.75,53,Financial Services,Organization 1,2024-02,0.075,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,5,5,5,5,5,5,5,5,5,5,5,5,4,5,4.5,4.5,32,Financial Services,Organization 1,2024-03,0.062,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,40,1,5,4,4.225,1,5,5,4.575,3,5,4,4.375,3,5,4,4.230769230769231,47,Financial Services,Organization 1,2025-04,0.851,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,42,3,5,5,4.619047619047619,4,5,5,4.880952380952381,2,5,5,4.5476190476190474,3,5,5,4.404761904761905,43,Financial Services,Organization 1,2025-04,0.977,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,34,4,5,4.5,4.5,4,5,5,4.735294117647059,3,5,5,4.5,3,5,4,4.352941176470588,43,Financial Services,Organization 1,2025-04,0.791,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,26,3,5,5,4.653846153846154,3,5,5,4.769230769230769,3,5,5,4.653846153846154,3,5,5,4.615384615384615,48,Financial Services,Organization 1,2025-04,0.542,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,35,3,5,5,4.542857142857143,4,5,5,4.742857142857143,3,5,5,4.542857142857143,3,5,4,4.4,39,Financial Services,Organization 1,2025-05,0.897,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,19,4,5,5,4.578947368421052,4,5,5,4.7368421052631575,4,5,4,4.421052631578948,3,5,4,4.2631578947368425,21,Financial Services,Organization 1,2025-05,0.905,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,38,4,5,5,4.894736842105263,4,5,5,4.894736842105263,3,5,5,4.868421052631579,2,5,5,4.684210526315789,41,Financial Services,Organization 1,2024-06,0.927,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,36,3,5,5,4.75,4,5,5,4.833333333333333,2,5,5,4.555555555555555,3,5,5,4.527777777777778,39,Financial Services,Organization 1,2025-06,0.923,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,30,4,5,5,4.766666666666667,4,5,5,4.933333333333334,4,5,5,4.8,3,5,5,4.466666666666667,40,Financial Services,Organization 1,2024-07,0.75,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,35,4,5,5,4.771428571428571,4,5,5,4.885714285714286,1,5,5,4.457142857142857,1,5,5,4.457142857142857,48,Financial Services,Organization 1,2025-07,0.729,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,45,3,5,4,4.333333333333333,3,5,5,4.644444444444445,1,5,4,4.2,2,5,4,4,49,Financial Services,Organization 1,2025-08,0.918,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,41,3,5,4,4.219512195121951,3,5,5,4.658536585365853,3,5,4,4.073170731707317,3,5,4,3.804878048780488,48,Financial Services,Organization 1,2025-09,0.854,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,3,3,5,5,4.333333333333333,4,5,5,4.666666666666667,4,5,5,4.666666666666667,2,5,4,3.6666666666666665,32,Legal,Organization 3,2024-03,0.094,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,2,3,2.5,2.5,4,5,4.5,4.5,3,3,3,3,3,3,3,3,35,Legal,Organization 3,2024-03,0.057,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,7,3,5,5,4.571428571428571,4,5,5,4.714285714285714,3,5,5,4.571428571428571,3,5,5,4.285714285714286,8,Legal,Organization 3,2025-06,0.875,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,10,3,5,5,4.5,4,5,5,4.8,3,5,4.5,4.4,3,5,4,4.2,10,Legal,Organization 3,2025-06,1,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,3,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,35,Professional Services,Organization 4,2024-03,0.086,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,22,3,5,5,4.454545454545454,3,5,5,4.681818181818182,3,5,4,4,3,5,4,3.772727272727273,24,Education,Organization 6,2025-11,0.917,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,30,1,5,4,4.166666666666667,1,5,5,4.6,2,5,4,4.1,3,5,4,3.9,32,Education,Organization 6,2025-11,0.938,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,33,4,5,5,4.7272727272727275,4,5,5,4.848484848484849,3,5,5,4.454545454545454,3,5,5,4.393939393939394,43,Government,Organization 7,2025-09,0.767,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,27,4,5,5,4.888888888888889,4,5,5,4.962962962962963,4,5,5,4.8076923076923075,3,5,5,4.64,49,Financial Services,Organization 8,2025-12,0.551,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,4,3,5,4.5,4.25,4,5,5,4.75,3,5,4,4,3,5,3.5,3.75,53,Marketing,Organization 9,2024-02,0.075,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,5,5,5,5,5,5,5,5,4,5,4.5,4.5,5,5,5,5,35,Marketing,Organization 9,2024-03,0.057,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,2,3,4,3.5,3.5,4,5,4.5,4.5,3,4,3.5,3.5,3,4,3.5,3.5,53,Life Sciences,Organization 11,2024-02,0.038,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,3,4,5,5,4.666666666666667,5,5,5,5,4,5,5,4.666666666666667,4,5,4,4.333333333333333,29,Life Sciences,Organization 11,2024-08,0.103,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,6,4,5,4.5,4.5,4,5,5,4.833333333333333,4,5,4.5,4.5,4,5,4.5,4.5,38,Life Sciences,Organization 11,2024-09,0.158,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,6,1,5,4.5,3.6666666666666665,5,5,5,5,2,5,4.5,3.8333333333333335,1,5,4,3.6666666666666665,53,Life Sciences,Organization 12,2024-02,0.113,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,19,4,5,5,4.526315789473684,4,5,5,4.7894736842105265,2,5,4,4.315789473684211,3,5,4,4.157894736842105,20,Financial Services,Organization 13,2025-01,0.95,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,53,Retail,Organization 14,2024-02,0.038,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,5,5,5,5,5,5,5,5,5,5,5,5,4,5,4.5,4.5,53,Insurance,Organization 16,2024-02,0.038,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,11,4,5,5,4.818181818181818,5,5,5,5,4,5,5,4.7272727272727275,4,5,5,4.636363636363637,89,Healthcare,Organization 15,2025-11,0.124,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,3,4,5,5,4.666666666666667,5,5,5,5,2,5,5,4,3,5,4,4,53,Healthcare,Organization 15,2024-02,0.057,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,7,5,5,5,5,5,5,5,5,5,5,5,5,3,5,5,4.714285714285714,48,Healthcare,Organization 15,2024-08,0.146,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,2,5,5,5,5,5,5,5,5,4,5,4.5,4.5,4,5,4.5,4.5,39,Education,Organization 17,2025-10,0.051,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,31,1,5,5,4.516129032258065,1,5,5,4.677419355,3,5,5,4.5,3,5,4,4.2,34,Education,Organization 18,2025-10,0.912,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,14,4,5,5,4.857142857142857,4,5,5,4.928571428571429,4,5,5,4.714285714285714,4,5,5,4.785714285714286,19,Education,Organization 19,2025-11,0.737,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,22,4,5,5,4.818181818181818,4,5,5,4.863636363636363,3,5,5,4.7727272727272725,3,5,5,4.7272727272727275,24,Legal,Organization 20,2025-09,0.917,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,21,4,5,4,4.476190476190476,4,5,5,4.809523809523809,3,5,4,4.095238095238095,2,5,4,4.095238095238095,24,Legal,Organization 20,2025-09,0.875,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,22,4,5,5,4.681818181818182,4,5,5,4.818181818181818,3,5,5,4.523809523809524,3,5,5,4.428571428571429,65,Other,Organization 21,2025-10,0.338,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,33,3,5,5,4.575757575757576,4,5,5,4.878787878787879,3,5,5,4.454545454545454,2,5,4,4.333333333333333,89,Other,Organization 21,2025-11,0.371,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,19,4,5,5,4.631578947368421,4,5,5,4.947368421052632,3,5,5,4.7368421052631575,4,5,5,4.631578947368421,22,Other,Organization 21,2024-11,0.864,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,2,4,5,4.5,4.5,5,5,5,5,5,5,5,5,4,5,4.5,4.5,53,Other,Organization 21,2024-02,0.038,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,18,2,5,5,4.388888888888889,4,5,5,4.777777777777778,2,5,4,4.111111111111111,2,5,4,3.9444444444444446,32,Other,Organization 21,2024-03,0.562,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,15,3,5,5,4.666666666666667,4,5,5,4.933333333333334,4,5,5,4.866666666666666,2,5,5,4.266666666666667,35,Other,Organization 21,2024-03,0.429,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,12,4,5,5,4.916666666666667,5,5,5,5,2,5,5,4.666666666666667,2,5,4,4.166666666666667,31,Other,Organization 21,2024-05,0.387,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,32,3,5,5,4.75,4,5,5,4.9375,4,5,5,4.71875,3,5,5,4.59375,42,Other,Organization 21,2024-06,0.762,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,19,4,5,5,4.7368421052631575,4,5,5,4.894736842105263,4,5,5,4.7368421052631575,3,5,5,4.473684210526316,29,Other,Organization 21,2024-08,0.655,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,26,4,5,5,4.884615384615385,3,5,5,4.730769230769231,4,5,5,4.730769230769231,3,5,5,4.730769230769231,48,Other,Organization 21,2024-08,0.542,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,12,3,5,5,4.5,4,5,5,4.833333333333333,2,5,4,4.25,3,5,4,4.166666666666667,26,Other,Organization 21,2024-09,0.462,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,18,3,5,5,4.611111111111111,5,5,5,5,4,5,5,4.722222222222222,3,5,5,4.666666666666667,38,Other,Organization 21,2024-09,0.474,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,34,3,5,5,4.529411764705882,4,5,5,4.588235294117647,3,5,4,4.352941176470588,3,5,4,4.147058823529412,50,Education,Organization 22,2025-05,0.68,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,16,4,5,5,4.625,4,5,5,4.875,4,5,4.5,4.5,3,5,4.5,4.375,18,Legal,Organization 24,2025-10,0.889,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,15,3,5,5,4.666666666666667,4,5,5,4.866666666666666,3,5,4,4.4,3,5,4,4.266666666666667,26,Legal,Organization 24,2025-10,0.577,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,4,5,4.5,4.5,5,5,5,5,5,5,5,5,4,5,4.5,4.5,53,Professional Services,Organization 26,2024-02,0.038,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,6,3,5,5,4.5,4,5,5,4.833333333333333,4,5,4.5,4.5,3,5,4,4,35,Professional Services,Organization 26,2024-03,0.171,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,11,2,5,5,4.454545454545454,4,5,5,4.909090909090909,3,5,5,4.454545454545454,3,5,5,4.454545454545454,31,Life Sciences,Organization 27,2024-05,0.355,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,4,5,4.5,4.5,4,5,4.5,4.5,3,5,4,4,3,5,4,4,53,Financial Services,Organization 28,2024-02,0.038,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,19,3,5,5,4.578947368421052,4,5,5,4.947368421052632,4,5,5,4.842105263157895,3,5,5,4.421052631578948,23,Financial Services,Organization 28,2024-02,0.826,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,3,3,4,4,3.6666666666666665,4,5,5,4.666666666666667,4,5,5,4.666666666666667,3,5,4,4,31,Financial Services,Organization 28,2024-05,0.097,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,4,4,5,5,4.75,5,5,5,5,4,5,4,4.25,4,5,4,4.25,53,Financial Services,Organization 29,2024-02,0.075,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,2,5,5,5,5,5,5,5,5,3,5,4,4,3,5,4,4,42,Financial Services,Organization 29,2024-06,0.048,Introductory,Data Consumer,0
+Maximizing Productivity with Generative AI,6,4,5,4.5,4.5,4,5,5,4.833333333333333,3,5,5,4.5,3,5,4,4.166666666666667,6,Professional Services,Organization 30,2024-09,1,Introductory,Data Consumer,1
+Maximizing Productivity with Generative AI,12,4,5,5,4.916666666666667,4,5,5,4.916666666666667,4,5,5,4.666666666666667,4,5,5,4.75,12,Government,Organization 31,2025-09,1,Introductory,Data Consumer,1
+Understanding and Leveraging Large Language Models,17,4,5,5,4.647058823529412,4,5,5,4.764705882352941,4,5,5,4.529411764705882,3,5,4,4.411764705882353,19,Financial Services,Organization 1,2025-11,0.895,Introductory,Data Consumer,1

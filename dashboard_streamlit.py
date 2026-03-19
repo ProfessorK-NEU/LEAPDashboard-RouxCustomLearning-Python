@@ -1,0 +1,894 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ANALYTICAL LEAP — Learner Experience Executive Dashboard (Streamlit)
+# Run with: streamlit run dashboard_streamlit.py
+# Required: pip install streamlit plotly pandas scipy numpy
+# ─────────────────────────────────────────────────────────────────────────────
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from scipy import stats
+
+st.set_page_config(
+    page_title="Analytical LEAP — Learner Experience",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# ── Custom CSS ────────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+  .metric-card {
+    background: white; border-radius: 10px; padding: 18px 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07); border-left: 4px solid #1B4F72;
+    margin-bottom: 12px;
+  }
+  .metric-val  { font-size: 2rem; font-weight: 700; color: #1B4F72; }
+  .metric-lbl  { font-size: 0.85rem; color: #888; margin-top: 2px; }
+  .section-hdr { font-size: 1.1rem; font-weight: 600; color: #1B4F72;
+                 border-bottom: 2px solid #D5E8F0; padding-bottom: 4px; margin-bottom: 12px; }
+  [data-testid="stSidebar"] { background: #1B4F72; }
+  [data-testid="stSidebar"] label, [data-testid="stSidebar"] .st-emotion-cache-16idsys p
+    { color: #cde; }
+  .partner-banner {
+    background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%);
+    border-radius: 12px; padding: 28px 36px; margin-bottom: 24px; color: white;
+  }
+  .partner-banner h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 4px 0; color: white; }
+  .partner-banner p  { font-size: 0.95rem; margin: 0; opacity: 0.85; }
+  .partner-kpi {
+    background: white; border-radius: 10px; padding: 20px 18px; text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08); border-top: 4px solid #2E86C1;
+  }
+  .partner-kpi-val { font-size: 2.1rem; font-weight: 800; color: #1B4F72; }
+  .partner-kpi-lbl { font-size: 0.8rem; color: #999; text-transform: uppercase;
+                     letter-spacing: 0.05em; margin-top: 4px; }
+  .highlight-box {
+    background: #f0f8ff; border-left: 4px solid #27AE60; border-radius: 6px;
+    padding: 14px 18px; margin-bottom: 10px;
+  }
+  .highlight-box b { color: #1B4F72; }
+  .benchmark-better { color: #27AE60; font-weight: 700; }
+  .benchmark-worse  { color: #E74C3C; font-weight: 700; }
+</style>
+""", unsafe_allow_html=True)
+
+# ── Palette ───────────────────────────────────────────────────────────────────
+PAL = ["#1B4F72","#2E86C1","#85C1E9","#D5E8F0",
+       "#F39C12","#E74C3C","#27AE60","#8E44AD"]
+
+# ── Metric config ─────────────────────────────────────────────────────────────
+METRICS = {
+    "Recommend":              "id_recommend_this_course_to_others_numeric_mean",
+    "Instructor Effectiveness":"my_instructor_was_an_effective_and_engaging_facilitator_of_learning_numeric_mean",
+    "Skill Acquisition":       "the_course_materials_and_assignments_helped_me_acquire_new_knowledge_and_skills_numeric_mean",
+    "Job Relevance":           "taking_this_course_will_improve_my_job_performance_numeric_mean",
+}
+METRIC_COLS = list(METRICS.values())
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+def wtd_mean(values, weights):
+    mask = values.notna() & weights.notna() & (weights > 0)
+    if mask.sum() == 0:
+        return np.nan
+    return np.average(values[mask], weights=weights[mask])
+
+def metric_card(label, value):
+    return f"""
+    <div class="metric-card">
+      <div class="metric-val">{value}</div>
+      <div class="metric-lbl">{label}</div>
+    </div>"""
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+@st.cache_data
+def load_data():
+    df = pd.read_csv("feedback_anonymized.csv")
+    for c in METRIC_COLS:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+    df["response_pct"]   = pd.to_numeric(df["response_pct"], errors="coerce")
+    df["total_learners"] = pd.to_numeric(df["total_learners"], errors="coerce")
+    df["responses"]      = pd.to_numeric(df["responses"], errors="coerce")
+    df["first_run_label"] = df["first_run_section"].map({1:"First Run", 0:"Repeat Run"})
+    df["calendar_month_dt"] = pd.to_datetime(df["calendar_month"])
+    return df
+
+df_raw = load_data()
+
+# ── Sidebar filters ───────────────────────────────────────────────────────────
+with st.sidebar:
+    st.markdown("## 📊 Analytical LEAP")
+    st.markdown("### Filters")
+
+    metric_label = st.selectbox("Primary Metric", list(METRICS.keys()))
+    metric_col   = METRICS[metric_label]
+
+    # Date range slider (uses YYYY-MM strings — sort correctly as text)
+    months_all = sorted(df_raw["calendar_month"].dropna().unique())
+    date_start, date_end = st.select_slider(
+        "Date Range",
+        options=months_all,
+        value=(months_all[0], months_all[-1])
+    )
+
+    # Cascading multiselects — each selection narrows the options below it
+    pool = df_raw[(df_raw["calendar_month"] >= date_start) &
+                  (df_raw["calendar_month"] <= date_end)].copy()
+
+    persona  = st.multiselect("Persona",      sorted(pool["persona"].dropna().unique()),      placeholder="All")
+    if persona:  pool = pool[pool["persona"].isin(persona)]
+
+    level    = st.multiselect("Level",        sorted(pool["level"].dropna().unique()),        placeholder="All")
+    if level:    pool = pool[pool["level"].isin(level)]
+
+    vertical = st.multiselect("Org Vertical", sorted(pool["org_vertical"].dropna().unique()), placeholder="All")
+    if vertical: pool = pool[pool["org_vertical"].isin(vertical)]
+
+    run_type = st.multiselect("Run Type",     sorted(pool["first_run_label"].dropna().unique()), placeholder="All")
+    if run_type: pool = pool[pool["first_run_label"].isin(run_type)]
+
+    org      = st.multiselect("Organization", sorted(pool["organization"].dropna().unique()), placeholder="All")
+    if org:      pool = pool[pool["organization"].isin(org)]
+
+    course   = st.multiselect("Course",       sorted(pool["course_title"].dropna().unique()), placeholder="All")
+    if course:   pool = pool[pool["course_title"].isin(course)]
+
+# ── Apply filters ─────────────────────────────────────────────────────────────
+df = pool
+
+# ── Guard: empty filtered dataset ─────────────────────────────────────────────
+if df.empty:
+    st.warning("No data matches the current filters. Adjust the sidebar selections to continue.")
+    st.stop()
+
+# ── Navigation tabs ───────────────────────────────────────────────────────────
+tabs = st.tabs([
+    "🏠 Overview",
+    "📚 Course Comparison",
+    "🔍 Segment Analysis",
+    "📬 Response Rates",
+    "📈 Trends",
+    "🔬 Statistical Tests",
+    "📋 Raw Data",
+    "🤝 Partner Report",
+])
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 1: OVERVIEW
+# ════════════════════════════════════════════════════════════════════════
+with tabs[0]:
+    st.markdown('<div class="section-hdr">Key Performance Indicators</div>',
+                unsafe_allow_html=True)
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.markdown(metric_card("Sections", f"{len(df):,}"), unsafe_allow_html=True)
+    with c2:
+        st.markdown(metric_card("Total Learners",
+                                f"{int(df['total_learners'].sum()):,}"), unsafe_allow_html=True)
+    with c3:
+        rr = wtd_mean(df["response_pct"], df["total_learners"])
+        st.markdown(metric_card("Avg Response Rate", f"{rr*100:.1f}%"), unsafe_allow_html=True)
+    with c4:
+        mv = wtd_mean(df[metric_col], df["responses"])
+        st.markdown(metric_card(f"{metric_label} (wtd)", f"{mv:.2f} / 5"), unsafe_allow_html=True)
+
+    st.divider()
+
+    c_left, c_right = st.columns([2, 1])
+
+    with c_left:
+        st.markdown('<div class="section-hdr">All Four Metrics — Weighted Mean</div>',
+                    unsafe_allow_html=True)
+        means = {lbl: wtd_mean(df[col], df["responses"])
+                 for lbl, col in METRICS.items()}
+        fig = go.Figure(go.Bar(
+            x=list(means.keys()), y=list(means.values()),
+            marker_color=PAL[:4],
+            text=[f"{v:.2f}" for v in means.values()],
+            textposition="outside"
+        ))
+        fig.update_layout(yaxis=dict(range=[1, 5.5], title="Weighted Mean (1–5)"),
+                          height=350, margin=dict(t=20, b=30))
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c_right:
+        st.markdown('<div class="section-hdr">Score Distribution</div>',
+                    unsafe_allow_html=True)
+        melt = df[METRIC_COLS].melt(var_name="metric", value_name="score").dropna()
+        melt["metric"] = melt["metric"].map({v:k for k,v in METRICS.items()})
+        fig2 = px.box(melt, x="metric", y="score", color="metric",
+                      color_discrete_sequence=PAL,
+                      range_y=[1, 5.5])
+        fig2.update_layout(showlegend=False, height=350,
+                           margin=dict(t=20, b=30),
+                           xaxis_title="", yaxis_title="Score")
+        st.plotly_chart(fig2, use_container_width=True)
+
+    c3a, c3b = st.columns(2)
+    with c3a:
+        st.markdown('<div class="section-hdr">Sections by Vertical</div>',
+                    unsafe_allow_html=True)
+        vc = df["org_vertical"].value_counts().reset_index()
+        vc.columns = ["vertical","count"]
+        fig3 = px.bar(vc, x="count", y="vertical", orientation="h",
+                      color_discrete_sequence=[PAL[1]])
+        fig3.update_layout(height=280, margin=dict(t=10, b=10),
+                           xaxis_title="Sections", yaxis_title="")
+        st.plotly_chart(fig3, use_container_width=True)
+
+    with c3b:
+        st.markdown('<div class="section-hdr">Sections by Persona & Level</div>',
+                    unsafe_allow_html=True)
+        pl = (df.groupby(["persona", "level"]).size()
+                .reset_index(name="count"))
+        fig4 = px.bar(pl, x="count", y="persona", color="level",
+                      orientation="h", barmode="stack",
+                      color_discrete_sequence=[PAL[0], PAL[4]],
+                      labels={"count": "Sections", "persona": "", "level": "Level"})
+        fig4.update_layout(height=280, margin=dict(t=10, b=10, l=10),
+                           legend=dict(orientation="h", y=-0.15))
+        st.plotly_chart(fig4, use_container_width=True)
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 2: COURSE COMPARISON
+# ════════════════════════════════════════════════════════════════════════
+with tabs[1]:
+    st.markdown(f'<div class="section-hdr">{metric_label} by Course</div>',
+                unsafe_allow_html=True)
+
+    d_course = (df.groupby("course_title")
+                  .apply(lambda g: pd.Series({
+                      "val": wtd_mean(g[metric_col], g["responses"]),
+                      "n":   g["responses"].sum()
+                  }))
+                  .reset_index()
+                  .dropna(subset=["val"])
+                  .sort_values("val", ascending=True))
+
+    fig = go.Figure(go.Bar(
+        x=d_course["val"], y=d_course["course_title"],
+        orientation="h",
+        text=[f"{v:.2f} (n={int(n)})" for v, n in zip(d_course["val"], d_course["n"])],
+        textposition="outside",
+        marker_color=PAL[0]
+    ))
+    fig.update_layout(height=max(400, len(d_course)*30),
+                      xaxis=dict(range=[1, 5.8], title=metric_label),
+                      yaxis_title="",
+                      margin=dict(l=320, t=20, b=20))
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.divider()
+    st.markdown('<div class="section-hdr">Heatmap — All Metrics × All Courses</div>',
+                unsafe_allow_html=True)
+
+    heat = (df.groupby("course_title")
+              .apply(lambda g: pd.Series({
+                  lbl: wtd_mean(g[col], g["responses"])
+                  for lbl, col in METRICS.items()
+              }))
+              .reset_index())
+
+    z_vals = heat[list(METRICS.keys())].values.round(2)
+    fig5 = go.Figure(go.Heatmap(
+        x=list(METRICS.keys()),
+        y=heat["course_title"],
+        z=z_vals,
+        colorscale=[[0,"#D5E8F0"],[0.5,"#2E86C1"],[1,"#1B4F72"]],
+        zmin=1, zmax=5,
+        text=z_vals, texttemplate="%{text}"
+    ))
+    fig5.update_layout(height=max(350, len(heat)*28),
+                       margin=dict(l=320, t=20, b=80))
+    st.plotly_chart(fig5, use_container_width=True)
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 3: SEGMENT ANALYSIS
+# ════════════════════════════════════════════════════════════════════════
+with tabs[2]:
+
+    def seg_bar(group_col, title, color):
+        d = (df.groupby(group_col)
+               .apply(lambda g: pd.Series({
+                   "val": wtd_mean(g[metric_col], g["responses"]),
+                   "n":   len(g)
+               }))
+               .reset_index()
+               .dropna(subset=["val"])
+               .sort_values("val", ascending=False))
+        fig = go.Figure(go.Bar(
+            x=d[group_col], y=d["val"],
+            text=[f"{v:.2f}\n(n={int(n)})" for v,n in zip(d["val"],d["n"])],
+            textposition="outside",
+            marker_color=color
+        ))
+        fig.update_layout(
+            title=title, height=300,
+            yaxis=dict(range=[1, 5.5], title=metric_label),
+            xaxis_title="", margin=dict(t=40, b=10)
+        )
+        return fig
+
+    c1, c2, c3 = st.columns(3)
+    with c1: st.plotly_chart(seg_bar("level",       "By Level",    PAL[0]), use_container_width=True)
+    with c2: st.plotly_chart(seg_bar("persona",     "By Persona",  PAL[4]), use_container_width=True)
+    with c3: st.plotly_chart(seg_bar("org_vertical","By Vertical", PAL[2]), use_container_width=True)
+
+    c4, c5 = st.columns(2)
+    with c4:
+        st.markdown('<div class="section-hdr">First Run vs Repeat — All Metrics</div>',
+                    unsafe_allow_html=True)
+        fr = (df.groupby("first_run_label")
+                .apply(lambda g: pd.Series({
+                    lbl: wtd_mean(g[col], g["responses"])
+                    for lbl, col in METRICS.items()
+                }))
+                .reset_index()
+                .melt(id_vars="first_run_label", var_name="metric", value_name="val"))
+        fig6 = px.bar(fr, x="metric", y="val", color="first_run_label",
+                      barmode="group", color_discrete_sequence=[PAL[0], PAL[4]],
+                      range_y=[1, 5.5])
+        fig6.update_layout(height=320, margin=dict(t=20))
+        st.plotly_chart(fig6, use_container_width=True)
+
+    with c5:
+        st.plotly_chart(seg_bar("organization", "By Organization", PAL[1]),
+                        use_container_width=True)
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 4: RESPONSE RATES
+# ════════════════════════════════════════════════════════════════════════
+with tabs[3]:
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.markdown('<div class="section-hdr">Response Rate by Course</div>',
+                    unsafe_allow_html=True)
+        d = (df.groupby("course_title")
+               .apply(lambda g: wtd_mean(g["response_pct"], g["total_learners"]))
+               .reset_index(name="rr")
+               .dropna()
+               .sort_values("rr", ascending=True))
+        fig = go.Figure(go.Bar(
+            x=d["rr"], y=d["course_title"], orientation="h",
+            text=[f"{v*100:.1f}%" for v in d["rr"]],
+            textposition="outside", marker_color=PAL[2]
+        ))
+        fig.update_layout(height=max(350, len(d)*28),
+                          xaxis=dict(range=[0, 1.2], tickformat=".0%"),
+                          margin=dict(l=320, t=10))
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c2:
+        st.markdown('<div class="section-hdr">Response Rate by Vertical</div>',
+                    unsafe_allow_html=True)
+        d2 = (df.groupby("org_vertical")
+                .apply(lambda g: wtd_mean(g["response_pct"], g["total_learners"]))
+                .reset_index(name="rr")
+                .dropna()
+                .sort_values("rr", ascending=True))
+        fig2 = go.Figure(go.Bar(
+            x=d2["rr"], y=d2["org_vertical"], orientation="h",
+            text=[f"{v*100:.1f}%" for v in d2["rr"]],
+            textposition="outside", marker_color=PAL[4]
+        ))
+        fig2.update_layout(height=350, xaxis=dict(range=[0,1.2], tickformat=".0%"),
+                           margin=dict(l=160, t=10))
+        st.plotly_chart(fig2, use_container_width=True)
+
+    c3, c4 = st.columns(2)
+    with c3:
+        st.markdown('<div class="section-hdr">Response Rate vs Satisfaction</div>',
+                    unsafe_allow_html=True)
+        sc = df[["response_pct", metric_col, "course_title",
+                 "organization", "persona", "level"]].dropna()
+        if len(sc) >= 2:
+            r, p = stats.pearsonr(sc["response_pct"], sc[metric_col])
+            fig3 = px.scatter(sc, x="response_pct", y=metric_col,
+                              color="persona", color_discrete_sequence=PAL,
+                              hover_data=["course_title","organization"],
+                              trendline="ols" if len(sc) >= 3 else None,
+                              range_y=[1, 5.5],
+                              labels={"response_pct":"Response Rate", metric_col: metric_label})
+            fig3.update_layout(height=340,
+                               title=f"Pearson r={r:.3f}, p={p:.3f}",
+                               margin=dict(t=40))
+            fig3.update_xaxes(tickformat=".0%")
+            st.plotly_chart(fig3, use_container_width=True)
+        else:
+            st.info("Not enough data points for correlation analysis (need at least 2 sections).")
+
+    with c4:
+        st.markdown('<div class="section-hdr">Response Rate: First Run vs Repeat</div>',
+                    unsafe_allow_html=True)
+        d4 = (df.groupby("first_run_label")
+                .apply(lambda g: wtd_mean(g["response_pct"], g["total_learners"]))
+                .reset_index(name="rr"))
+        fig4 = go.Figure(go.Bar(
+            x=d4["first_run_label"], y=d4["rr"],
+            text=[f"{v*100:.1f}%" for v in d4["rr"]],
+            textposition="outside",
+            marker_color=[PAL[0], PAL[4]]
+        ))
+        fig4.update_layout(height=340, yaxis=dict(range=[0, 1.2], tickformat=".0%"),
+                           xaxis_title="", margin=dict(t=10))
+        st.plotly_chart(fig4, use_container_width=True)
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 5: TRENDS
+# ════════════════════════════════════════════════════════════════════════
+with tabs[4]:
+    st.markdown(f'<div class="section-hdr">{metric_label} — Monthly Trend</div>',
+                unsafe_allow_html=True)
+
+    trend = (df.groupby("calendar_month_dt")
+               .apply(lambda g: pd.Series({
+                   "val": wtd_mean(g[metric_col], g["responses"]),
+                   "n":   len(g)
+               }))
+               .reset_index()
+               .dropna(subset=["val"]))
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=trend["calendar_month_dt"], y=trend["val"],
+        mode="lines+markers",
+        line=dict(color=PAL[0], width=2.5),
+        marker=dict(size=8),
+        name=metric_label
+    ))
+    fig.update_layout(height=380, yaxis=dict(range=[1,5.5], title=metric_label),
+                      xaxis_title="Month", margin=dict(t=10))
+    st.plotly_chart(fig, use_container_width=True)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        rrt = (df.groupby("calendar_month_dt")
+                 .apply(lambda g: wtd_mean(g["response_pct"], g["total_learners"]))
+                 .reset_index(name="rr")
+                 .dropna())
+        fig2 = px.line(rrt, x="calendar_month_dt", y="rr",
+                       markers=True, color_discrete_sequence=[PAL[4]])
+        fig2.update_layout(title="Response Rate — Monthly",
+                           height=300, yaxis=dict(tickformat=".0%"),
+                           xaxis_title="Month", yaxis_title="Response Rate")
+        st.plotly_chart(fig2, use_container_width=True)
+
+    with c2:
+        vol = df.groupby("calendar_month_dt").size().reset_index(name="sections")
+        fig3 = px.bar(vol, x="calendar_month_dt", y="sections",
+                      color_discrete_sequence=[PAL[2]])
+        fig3.update_layout(title="Section Volume — Monthly",
+                           height=300, xaxis_title="Month", yaxis_title="Sections")
+        st.plotly_chart(fig3, use_container_width=True)
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 6: STATISTICAL TESTS
+# ════════════════════════════════════════════════════════════════════════
+with tabs[5]:
+    st.markdown('<div class="section-hdr">One-Way ANOVA</div>', unsafe_allow_html=True)
+    st.caption("Tests whether mean scores differ significantly across groups. "
+               "p < 0.05 = statistically significant variation.")
+
+    group_col = st.selectbox("Group By",
+                             ["persona","level","org_vertical","first_run_label"])
+
+    clean = df[[metric_col, group_col, "responses"]].dropna()
+
+    if clean[group_col].nunique() >= 2:
+        groups = [grp[metric_col].values
+                  for _, grp in clean.groupby(group_col)
+                  if len(grp) >= 2]
+        if len(groups) < 2:
+            st.warning("Not enough groups with at least 2 observations for ANOVA. Try broadening your filters.")
+        else:
+            f_stat, p_val = stats.f_oneway(*groups)
+
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown("**ANOVA Result**")
+                result_df = pd.DataFrame({
+                    "Statistic": ["F-statistic", "p-value", "Significant"],
+                    "Value":     [f"{f_stat:.3f}", f"{p_val:.4f}",
+                                  "✓ Yes (p < 0.05)" if p_val < 0.05 else "✗ No"]
+                })
+                st.dataframe(result_df, use_container_width=True, hide_index=True)
+
+            with c2:
+                st.markdown("**Group Means**")
+                gm = (clean.groupby(group_col)
+                           .apply(lambda g: pd.Series({
+                               "N":          len(g),
+                               "Wtd Mean":   round(wtd_mean(g[metric_col], g["responses"]), 3),
+                               "Std Dev":    round(g[metric_col].std(), 3)
+                           }))
+                           .reset_index()
+                           .sort_values("Wtd Mean", ascending=False))
+                st.dataframe(gm, use_container_width=True, hide_index=True)
+    else:
+        st.warning("Need at least 2 groups in the filtered data for ANOVA.")
+
+    st.divider()
+    c3, c4 = st.columns(2)
+
+    with c3:
+        st.markdown('<div class="section-hdr">Correlation Matrix — All Metrics + Response Rate</div>',
+                    unsafe_allow_html=True)
+        corr_df = df[METRIC_COLS + ["response_pct"]].copy()
+        corr_df.columns = list(METRICS.keys()) + ["Response Rate"]
+        cm = corr_df.corr(numeric_only=True).round(2)
+        fig = go.Figure(go.Heatmap(
+            x=cm.columns, y=cm.index, z=cm.values,
+            colorscale=[[0,"#D5E8F0"],[0.5,"white"],[1,"#1B4F72"]],
+            zmin=-1, zmax=1,
+            text=cm.values.round(2), texttemplate="%{text}"
+        ))
+        fig.update_layout(height=380, margin=dict(l=150, b=120, t=10))
+        st.plotly_chart(fig, use_container_width=True)
+
+    with c4:
+        st.markdown('<div class="section-hdr">OLS Regression — Metric Predictors</div>',
+                    unsafe_allow_html=True)
+        st.caption(f"Dependent variable: {metric_label}")
+
+        try:
+            from sklearn.linear_model import LinearRegression
+            from sklearn.preprocessing import OneHotEncoder
+            import warnings
+            warnings.filterwarnings("ignore")
+
+            reg_df = df[[metric_col,"response_pct","first_run_section",
+                        "level","persona"]].dropna()
+            dummies = pd.get_dummies(
+                reg_df[["level","persona"]], drop_first=True)
+            X = pd.concat([
+                reg_df[["response_pct","first_run_section"]].reset_index(drop=True),
+                dummies.reset_index(drop=True)
+            ], axis=1).astype(float)
+            y = reg_df[metric_col].values
+
+            # Manual OLS with p-values using scipy
+            from numpy.linalg import lstsq
+            X_c = np.column_stack([np.ones(len(X)), X])
+            coef, _, _, _ = lstsq(X_c, y, rcond=None)
+            y_hat = X_c @ coef
+            residuals = y - y_hat
+            dof = len(y) - X_c.shape[1]
+            mse = np.sum(residuals**2) / dof
+            cov = mse * np.linalg.inv(X_c.T @ X_c)
+            se = np.sqrt(np.diag(cov))
+            t_stats = coef / se
+            p_vals = 2 * stats.t.sf(np.abs(t_stats), dof)
+
+            reg_result = pd.DataFrame({
+                "Term":    ["Intercept"] + list(X.columns),
+                "Coef":    coef.round(4),
+                "Std Err": se.round(4),
+                "t-stat":  t_stats.round(3),
+                "p-value": p_vals.round(4),
+                "Sig":     ["✓" if p < 0.05 else "" for p in p_vals]
+            })
+            st.dataframe(reg_result, use_container_width=True, hide_index=True,
+                         column_config={"Sig": st.column_config.TextColumn("Sig")})
+        except Exception as e:
+            st.error(f"Regression error: {e}")
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 7: RAW DATA
+# ════════════════════════════════════════════════════════════════════════
+with tabs[6]:
+    display_cols = [
+        "course_title","organization","org_vertical","calendar_month",
+        "persona","level","first_run_section","responses","total_learners",
+        "response_pct"
+    ] + METRIC_COLS
+
+    show = df[[c for c in display_cols if c in df.columns]].copy()
+    show.columns = [
+        "Course","Organization","Vertical","Month",
+        "Persona","Level","First Run","Responses","Total Learners",
+        "Response %", "Recommend","Instructor","Skills","Job Relevance"
+    ][:len(show.columns)]
+    show = show.round(3)
+
+    st.dataframe(show, use_container_width=True, height=500)
+    st.download_button(
+        "⬇️ Download Filtered Data",
+        data=show.to_csv(index=False).encode(),
+        file_name="leap_filtered.csv",
+        mime="text/csv"
+    )
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 8: PARTNER REPORT
+# ════════════════════════════════════════════════════════════════════════
+with tabs[7]:
+
+    # ── Partner selector ──────────────────────────────────────────────
+    all_orgs = sorted(df_raw["organization"].dropna().unique())
+    selected_partner = st.selectbox(
+        "Select Partner Organization",
+        all_orgs,
+        key="partner_org"
+    )
+
+    # Partner data: all data for this org within the date slider window
+    p_df = df_raw[
+        (df_raw["organization"] == selected_partner) &
+        (df_raw["calendar_month"] >= date_start) &
+        (df_raw["calendar_month"] <= date_end)
+    ].copy()
+
+    # Overall benchmark (all orgs, same date window)
+    bench_df = df_raw[
+        (df_raw["calendar_month"] >= date_start) &
+        (df_raw["calendar_month"] <= date_end)
+    ].copy()
+
+    if p_df.empty:
+        st.warning(f"No data found for {selected_partner} in the selected date range.")
+    else:
+        # ── Banner ────────────────────────────────────────────────────
+        n_courses   = p_df["course_title"].nunique()
+        n_learners  = int(p_df["total_learners"].sum())
+        n_sections  = len(p_df)
+        p_rr        = wtd_mean(p_df["response_pct"], p_df["total_learners"])
+        overall_sat = {lbl: wtd_mean(p_df[col], p_df["responses"])
+                       for lbl, col in METRICS.items()}
+        avg_sat     = np.nanmean([v for v in overall_sat.values() if not np.isnan(v)])
+
+        date_range_label = f"{date_start} – {date_end}"
+
+        st.markdown(f"""
+        <div class="partner-banner">
+          <h1>{selected_partner}</h1>
+          <p>Roux Custom Learning &nbsp;|&nbsp; Learner Experience Report &nbsp;|&nbsp; {date_range_label}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ── KPI row ───────────────────────────────────────────────────
+        k1, k2, k3, k4, k5 = st.columns(5)
+        kpis = [
+            (f"{n_courses}",         "Courses Delivered"),
+            (f"{n_sections}",        "Sections Completed"),
+            (f"{n_learners:,}",      "Learners Reached"),
+            (f"{avg_sat:.2f} / 5",   "Avg Satisfaction"),
+            (f"{p_rr*100:.1f}%",     "Feedback Response Rate"),
+        ]
+        for col, (val, lbl) in zip([k1, k2, k3, k4, k5], kpis):
+            with col:
+                st.markdown(
+                    f'<div class="partner-kpi">'
+                    f'<div class="partner-kpi-val">{val}</div>'
+                    f'<div class="partner-kpi-lbl">{lbl}</div>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # ── Benchmark comparison ──────────────────────────────────────
+        st.markdown('<div class="section-hdr">How You Compare — Satisfaction vs. Roux Portfolio Benchmark</div>',
+                    unsafe_allow_html=True)
+
+        bench_vals = {lbl: wtd_mean(bench_df[col], bench_df["responses"])
+                      for lbl, col in METRICS.items()}
+
+        bm_rows = []
+        for lbl in METRICS:
+            pv = overall_sat[lbl]
+            bv = bench_vals[lbl]
+            if not (np.isnan(pv) or np.isnan(bv)):
+                diff = pv - bv
+                arrow = "▲" if diff >= 0 else "▼"
+                css   = "benchmark-better" if diff >= 0 else "benchmark-worse"
+                bm_rows.append({
+                    "Metric":      lbl,
+                    "Your Score":  f"{pv:.2f}",
+                    "Portfolio Avg": f"{bv:.2f}",
+                    "Difference":  f'<span class="{css}">{arrow} {abs(diff):.2f}</span>'
+                })
+
+        bm_df = pd.DataFrame(bm_rows)
+
+        bc1, bc2 = st.columns([1, 2])
+        with bc1:
+            # Render as HTML table so the colored spans work
+            html_rows = "".join(
+                f"<tr><td>{r['Metric']}</td><td>{r['Your Score']}</td>"
+                f"<td>{r['Portfolio Avg']}</td><td>{r['Difference']}</td></tr>"
+                for _, r in bm_df.iterrows()
+            )
+            st.markdown(f"""
+            <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+              <thead>
+                <tr style="background:#1B4F72;color:white;">
+                  <th style="padding:8px;text-align:left">Metric</th>
+                  <th style="padding:8px;text-align:center">Your Score</th>
+                  <th style="padding:8px;text-align:center">Portfolio Avg</th>
+                  <th style="padding:8px;text-align:center">vs. Benchmark</th>
+                </tr>
+              </thead>
+              <tbody>{html_rows}</tbody>
+            </table>
+            """, unsafe_allow_html=True)
+
+        with bc2:
+            fig_bm = go.Figure()
+            fig_bm.add_trace(go.Bar(
+                name="Portfolio Avg", x=list(METRICS.keys()),
+                y=[bench_vals[l] for l in METRICS],
+                marker_color=PAL[3], opacity=0.85
+            ))
+            fig_bm.add_trace(go.Bar(
+                name=selected_partner, x=list(METRICS.keys()),
+                y=[overall_sat[l] for l in METRICS],
+                marker_color=PAL[0]
+            ))
+            fig_bm.update_layout(
+                barmode="group", height=260,
+                yaxis=dict(range=[1, 5.5], title="Score (1–5)"),
+                xaxis_title="", margin=dict(t=10, b=10),
+                legend=dict(orientation="h", y=-0.25)
+            )
+            st.plotly_chart(fig_bm, use_container_width=True)
+
+        st.divider()
+
+        # ── Course performance table ──────────────────────────────────
+        st.markdown('<div class="section-hdr">Course Performance Summary</div>',
+                    unsafe_allow_html=True)
+
+        course_summary = (
+            p_df.groupby("course_title")
+              .apply(lambda g: pd.Series({
+                  "Sections":          len(g),
+                  "Learners":          int(g["total_learners"].sum()),
+                  "Response Rate":     wtd_mean(g["response_pct"], g["total_learners"]),
+                  "Recommend":         wtd_mean(g[METRICS["Recommend"]], g["responses"]),
+                  "Instructor":        wtd_mean(g[METRICS["Instructor Effectiveness"]], g["responses"]),
+                  "Skill Acquisition": wtd_mean(g[METRICS["Skill Acquisition"]], g["responses"]),
+                  "Job Relevance":     wtd_mean(g[METRICS["Job Relevance"]], g["responses"]),
+              }))
+              .reset_index()
+              .rename(columns={"course_title": "Course"})
+        )
+        course_summary["Avg Score"] = course_summary[
+            ["Recommend","Instructor","Skill Acquisition","Job Relevance"]
+        ].mean(axis=1)
+        course_summary = course_summary.sort_values("Avg Score", ascending=False)
+
+        # Format display columns
+        for col in ["Response Rate","Recommend","Instructor","Skill Acquisition","Job Relevance","Avg Score"]:
+            course_summary[col] = course_summary[col].round(2)
+        course_summary["Response Rate"] = course_summary["Response Rate"].apply(
+            lambda x: f"{x*100:.1f}%" if pd.notna(x) else "—"
+        )
+
+        st.dataframe(
+            course_summary.set_index("Course"),
+            use_container_width=True,
+            column_config={
+                "Avg Score":        st.column_config.ProgressColumn("Avg Score", min_value=1, max_value=5, format="%.2f"),
+                "Recommend":        st.column_config.NumberColumn(format="%.2f"),
+                "Instructor":       st.column_config.NumberColumn(format="%.2f"),
+                "Skill Acquisition":st.column_config.NumberColumn(format="%.2f"),
+                "Job Relevance":    st.column_config.NumberColumn(format="%.2f"),
+            }
+        )
+
+        st.divider()
+
+        # ── Satisfaction heatmap by course ────────────────────────────
+        cl, cr = st.columns([3, 2])
+
+        with cl:
+            st.markdown('<div class="section-hdr">Satisfaction Heatmap — All Courses × Metrics</div>',
+                        unsafe_allow_html=True)
+            heat_p = (p_df.groupby("course_title")
+                          .apply(lambda g: pd.Series({
+                              lbl: wtd_mean(g[col], g["responses"])
+                              for lbl, col in METRICS.items()
+                          }))
+                          .reset_index()
+                          .dropna(how="all", subset=list(METRICS.keys())))
+            z_p = heat_p[list(METRICS.keys())].values.round(2)
+            fig_h = go.Figure(go.Heatmap(
+                x=list(METRICS.keys()),
+                y=heat_p["course_title"],
+                z=z_p,
+                colorscale=[[0,"#D5E8F0"],[0.5,"#2E86C1"],[1,"#1B4F72"]],
+                zmin=1, zmax=5,
+                text=z_p, texttemplate="%{text}"
+            ))
+            fig_h.update_layout(
+                height=max(250, len(heat_p) * 34),
+                margin=dict(l=300, t=10, b=60)
+            )
+            st.plotly_chart(fig_h, use_container_width=True)
+
+        with cr:
+            st.markdown('<div class="section-hdr">Satisfaction Over Time</div>',
+                        unsafe_allow_html=True)
+            trend_p = (p_df.groupby("calendar_month_dt")
+                           .apply(lambda g: pd.Series({
+                               lbl: wtd_mean(g[col], g["responses"])
+                               for lbl, col in METRICS.items()
+                           }))
+                           .reset_index()
+                           .dropna(how="all", subset=list(METRICS.keys())))
+            fig_t = go.Figure()
+            for i, (lbl, _) in enumerate(METRICS.items()):
+                fig_t.add_trace(go.Scatter(
+                    x=trend_p["calendar_month_dt"], y=trend_p[lbl],
+                    mode="lines+markers", name=lbl,
+                    line=dict(color=PAL[i], width=2)
+                ))
+            fig_t.update_layout(
+                height=max(250, len(heat_p) * 34),
+                yaxis=dict(range=[1, 5.5], title="Score"),
+                xaxis_title="Month",
+                legend=dict(orientation="h", y=-0.3),
+                margin=dict(t=10, b=60)
+            )
+            st.plotly_chart(fig_t, use_container_width=True)
+
+        st.divider()
+
+        # ── Highlights ────────────────────────────────────────────────
+        st.markdown('<div class="section-hdr">Highlights</div>', unsafe_allow_html=True)
+
+        h1, h2, h3 = st.columns(3)
+
+        with h1:
+            top_course = course_summary.iloc[0]
+            st.markdown(
+                f'<div class="highlight-box">'
+                f'<b>Top Rated Course</b><br>'
+                f'{top_course["Course"]}<br>'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#1B4F72">'
+                f'{top_course["Avg Score"]:.2f} / 5</span>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+        with h2:
+            best_metric = max(overall_sat, key=lambda k: overall_sat[k] if not np.isnan(overall_sat[k]) else 0)
+            best_val    = overall_sat[best_metric]
+            st.markdown(
+                f'<div class="highlight-box">'
+                f'<b>Strongest Dimension</b><br>'
+                f'{best_metric}<br>'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#1B4F72">'
+                f'{best_val:.2f} / 5</span>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+        with h3:
+            st.markdown(
+                f'<div class="highlight-box">'
+                f'<b>Learner Engagement</b><br>'
+                f'Feedback response rate<br>'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#1B4F72">'
+                f'{p_rr*100:.1f}%</span>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+        # ── Download ──────────────────────────────────────────────────
+        st.markdown("<br>", unsafe_allow_html=True)
+        dl_cols = ["course_title","calendar_month","persona","level",
+                   "responses","total_learners","response_pct"] + METRIC_COLS
+        dl_df = p_df[[c for c in dl_cols if c in p_df.columns]].copy().round(3)
+        st.download_button(
+            f"⬇️ Download {selected_partner} Data",
+            data=dl_df.to_csv(index=False).encode(),
+            file_name=f"leap_{selected_partner.replace(' ','_')}.csv",
+            mime="text/csv"
+        )
