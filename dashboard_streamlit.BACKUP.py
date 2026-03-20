@@ -9,18 +9,11 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import plotly.io as pio
 from plotly.subplots import make_subplots
 from scipy import stats
 
-# ── Global chart font size ─────────────────────────────────────────────────────
-pio.templates["roux"] = go.layout.Template(
-    layout=go.Layout(font=dict(size=15))
-)
-pio.templates.default = "plotly+roux"
-
 st.set_page_config(
-    page_title="Roux Institute Custom Learning Feedback Dashboard",
+    page_title="Analytical LEAP — Learner Experience",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -31,48 +24,42 @@ st.markdown("""
 <style>
   .metric-card {
     background: white; border-radius: 10px; padding: 18px 22px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.07); border-left: 4px solid #A4804A;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07); border-left: 4px solid #1B4F72;
     margin-bottom: 12px;
   }
-  .metric-val  { font-size: 2rem; font-weight: 700; color: #7A5C2E; }
-  .metric-lbl  { font-size: 0.85rem; color: #555; margin-top: 2px; }
-  .section-hdr { font-size: 1.1rem; font-weight: 600; color: #7A5C2E;
-                 border-bottom: 2px solid #F0E2C8; padding-bottom: 4px; margin-bottom: 12px; }
-  [data-testid="stSidebar"] { background: #A6192E; }
+  .metric-val  { font-size: 2rem; font-weight: 700; color: #1B4F72; }
+  .metric-lbl  { font-size: 0.85rem; color: #888; margin-top: 2px; }
+  .section-hdr { font-size: 1.1rem; font-weight: 600; color: #1B4F72;
+                 border-bottom: 2px solid #D5E8F0; padding-bottom: 4px; margin-bottom: 12px; }
+  [data-testid="stSidebar"] { background: #1B4F72; }
   [data-testid="stSidebar"] label, [data-testid="stSidebar"] .st-emotion-cache-16idsys p
-    { color: #fce; }
+    { color: #cde; }
   .partner-banner {
-    background: linear-gradient(135deg, #7A5C2E 0%, #A4804A 60%, #D4A568 100%);
+    background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%);
     border-radius: 12px; padding: 28px 36px; margin-bottom: 24px; color: white;
   }
   .partner-banner h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 4px 0; color: white; }
   .partner-banner p  { font-size: 0.95rem; margin: 0; opacity: 0.85; }
   .partner-kpi {
     background: white; border-radius: 10px; padding: 20px 18px; text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,.08); border-top: 4px solid #A4804A;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08); border-top: 4px solid #2E86C1;
   }
-  .partner-kpi-val { font-size: 2.1rem; font-weight: 800; color: #7A5C2E; }
-  .partner-kpi-lbl { font-size: 0.8rem; color: #777; text-transform: uppercase;
+  .partner-kpi-val { font-size: 2.1rem; font-weight: 800; color: #1B4F72; }
+  .partner-kpi-lbl { font-size: 0.8rem; color: #999; text-transform: uppercase;
                      letter-spacing: 0.05em; margin-top: 4px; }
   .highlight-box {
-    background: #fdf6ed; border-left: 4px solid #A4804A; border-radius: 6px;
+    background: #f0f8ff; border-left: 4px solid #27AE60; border-radius: 6px;
     padding: 14px 18px; margin-bottom: 10px;
   }
-  .highlight-box b { color: #7A5C2E; }
-  .benchmark-better { color: #2D6A3F; font-weight: 700; }
-  .benchmark-worse  { color: #C8102E; font-weight: 700; }
+  .highlight-box b { color: #1B4F72; }
+  .benchmark-better { color: #27AE60; font-weight: 700; }
+  .benchmark-worse  { color: #E74C3C; font-weight: 700; }
 </style>
 """, unsafe_allow_html=True)
 
 # ── Palette ───────────────────────────────────────────────────────────────────
-PAL = ["#A4804A",  # 0: NU Gold (primary)
-       "#D4A568",  # 1: Medium Gold
-       "#7A5C2E",  # 2: Dark Gold / Walnut
-       "#F0E2C8",  # 3: Pale Gold (light fill)
-       "#C8A882",  # 4: Warm Tan / Sand
-       "#545454",  # 5: Dark Gray
-       "#C8102E",  # 6: NU Red (accent only)
-       "#9E9E9E"]  # 7: Mid Gray
+PAL = ["#1B4F72","#2E86C1","#85C1E9","#D5E8F0",
+       "#F39C12","#E74C3C","#27AE60","#8E44AD"]
 
 # ── Metric config ─────────────────────────────────────────────────────────────
 METRICS = {
@@ -114,11 +101,10 @@ df_raw = load_data()
 
 # ── Sidebar filters ───────────────────────────────────────────────────────────
 with st.sidebar:
-    st.image("The Roux Institute_RGB_Monogram_RGB_NURed+B.png", width=140)
-    st.markdown("## Roux Institute Custom Learning Feedback Dashboard")
+    st.markdown("## 📊 Analytical LEAP")
     st.markdown("### Filters")
 
-    metric_label = st.selectbox("Primary Metric", list(METRICS.keys()), key="metric_sel")
+    metric_label = st.selectbox("Primary Metric", list(METRICS.keys()))
     metric_col   = METRICS[metric_label]
 
     # Date range slider (uses YYYY-MM strings — sort correctly as text)
@@ -126,38 +112,30 @@ with st.sidebar:
     date_start, date_end = st.select_slider(
         "Date Range",
         options=months_all,
-        value=(months_all[0], months_all[-1]),
-        key="date_range"
+        value=(months_all[0], months_all[-1])
     )
 
     # Cascading multiselects — each selection narrows the options below it
     pool = df_raw[(df_raw["calendar_month"] >= date_start) &
                   (df_raw["calendar_month"] <= date_end)].copy()
 
-    persona  = st.multiselect("Persona",      sorted(pool["persona"].dropna().unique()),         placeholder="All", key="ms_persona")
+    persona  = st.multiselect("Persona",      sorted(pool["persona"].dropna().unique()),      placeholder="All")
     if persona:  pool = pool[pool["persona"].isin(persona)]
 
-    level    = st.multiselect("Level",        sorted(pool["level"].dropna().unique()),            placeholder="All", key="ms_level")
+    level    = st.multiselect("Level",        sorted(pool["level"].dropna().unique()),        placeholder="All")
     if level:    pool = pool[pool["level"].isin(level)]
 
-    vertical = st.multiselect("Org Vertical", sorted(pool["org_vertical"].dropna().unique()),     placeholder="All", key="ms_vertical")
+    vertical = st.multiselect("Org Vertical", sorted(pool["org_vertical"].dropna().unique()), placeholder="All")
     if vertical: pool = pool[pool["org_vertical"].isin(vertical)]
 
-    run_type = st.multiselect("Run Type",     sorted(pool["first_run_label"].dropna().unique()),  placeholder="All", key="ms_run_type")
+    run_type = st.multiselect("Run Type",     sorted(pool["first_run_label"].dropna().unique()), placeholder="All")
     if run_type: pool = pool[pool["first_run_label"].isin(run_type)]
 
-    org      = st.multiselect("Organization", sorted(pool["organization"].dropna().unique()),     placeholder="All", key="ms_org")
+    org      = st.multiselect("Organization", sorted(pool["organization"].dropna().unique()), placeholder="All")
     if org:      pool = pool[pool["organization"].isin(org)]
 
-    course   = st.multiselect("Course",       sorted(pool["course_title"].dropna().unique()),     placeholder="All", key="ms_course")
+    course   = st.multiselect("Course",       sorted(pool["course_title"].dropna().unique()), placeholder="All")
     if course:   pool = pool[pool["course_title"].isin(course)]
-
-    st.divider()
-    if st.button("🔄 Reset All Filters", use_container_width=True):
-        for k in ["metric_sel", "date_range", "ms_persona", "ms_level",
-                  "ms_vertical", "ms_run_type", "ms_org", "ms_course"]:
-            st.session_state.pop(k, None)
-        st.rerun()
 
 # ── Apply filters ─────────────────────────────────────────────────────────────
 df = pool
@@ -301,7 +279,7 @@ with tabs[1]:
         x=list(METRICS.keys()),
         y=heat["course_title"],
         z=z_vals,
-        colorscale=[[0,"#F0E2C8"],[0.5,"#A4804A"],[1,"#7A5C2E"]],
+        colorscale=[[0,"#D5E8F0"],[0.5,"#2E86C1"],[1,"#1B4F72"]],
         zmin=1, zmax=5,
         text=z_vals, texttemplate="%{text}"
     ))
@@ -546,7 +524,7 @@ with tabs[5]:
         cm = corr_df.corr(numeric_only=True).round(2)
         fig = go.Figure(go.Heatmap(
             x=cm.columns, y=cm.index, z=cm.values,
-            colorscale=[[0,"#6B0020"],[0.5,"white"],[1,"#A4804A"]],
+            colorscale=[[0,"#D5E8F0"],[0.5,"white"],[1,"#1B4F72"]],
             zmin=-1, zmax=1,
             text=cm.values.round(2), texttemplate="%{text}"
         ))
@@ -729,7 +707,7 @@ with tabs[7]:
             st.markdown(f"""
             <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
               <thead>
-                <tr style="background:#7A5C2E;color:white;">
+                <tr style="background:#1B4F72;color:white;">
                   <th style="padding:8px;text-align:left">Metric</th>
                   <th style="padding:8px;text-align:center">Your Score</th>
                   <th style="padding:8px;text-align:center">Portfolio Avg</th>
@@ -824,7 +802,7 @@ with tabs[7]:
                 x=list(METRICS.keys()),
                 y=heat_p["course_title"],
                 z=z_p,
-                colorscale=[[0,"#F0E2C8"],[0.5,"#A4804A"],[1,"#7A5C2E"]],
+                colorscale=[[0,"#D5E8F0"],[0.5,"#2E86C1"],[1,"#1B4F72"]],
                 zmin=1, zmax=5,
                 text=z_p, texttemplate="%{text}"
             ))
@@ -873,7 +851,7 @@ with tabs[7]:
                 f'<div class="highlight-box">'
                 f'<b>Top Rated Course</b><br>'
                 f'{top_course["Course"]}<br>'
-                f'<span style="font-size:1.4rem;font-weight:700;color:#7A5C2E">'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#1B4F72">'
                 f'{top_course["Avg Score"]:.2f} / 5</span>'
                 f'</div>',
                 unsafe_allow_html=True
@@ -886,7 +864,7 @@ with tabs[7]:
                 f'<div class="highlight-box">'
                 f'<b>Strongest Dimension</b><br>'
                 f'{best_metric}<br>'
-                f'<span style="font-size:1.4rem;font-weight:700;color:#7A5C2E">'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#1B4F72">'
                 f'{best_val:.2f} / 5</span>'
                 f'</div>',
                 unsafe_allow_html=True
@@ -897,7 +875,7 @@ with tabs[7]:
                 f'<div class="highlight-box">'
                 f'<b>Learner Engagement</b><br>'
                 f'Feedback response rate<br>'
-                f'<span style="font-size:1.4rem;font-weight:700;color:#7A5C2E">'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#1B4F72">'
                 f'{p_rr*100:.1f}%</span>'
                 f'</div>',
                 unsafe_allow_html=True
