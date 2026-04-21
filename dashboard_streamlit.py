@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio
 from plotly.subplots import make_subplots
 from scipy import stats
 import matplotlib
@@ -17,8 +18,14 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import io, base64
 
+# ── Global chart font size ─────────────────────────────────────────────────────
+pio.templates["roux"] = go.layout.Template(
+    layout=go.Layout(font=dict(size=15))
+)
+pio.templates.default = "plotly+roux"
+
 st.set_page_config(
-    page_title="Analytical LEAP — Learner Experience",
+    page_title="Roux Institute Custom Learning Feedback Dashboard",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -29,35 +36,55 @@ st.markdown("""
 <style>
   .metric-card {
     background: white; border-radius: 10px; padding: 18px 22px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.07); border-left: 4px solid #1B4F72;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07); border-left: 4px solid #A4804A;
     margin-bottom: 12px;
   }
-  .metric-val  { font-size: 2rem; font-weight: 700; color: #1B4F72; }
-  .metric-lbl  { font-size: 0.85rem; color: #888; margin-top: 2px; }
-  .section-hdr { font-size: 1.1rem; font-weight: 600; color: #1B4F72;
-                 border-bottom: 2px solid #D5E8F0; padding-bottom: 4px; margin-bottom: 12px; }
-  [data-testid="stSidebar"] { background: #1B4F72; }
+  .metric-val  { font-size: 2rem; font-weight: 700; color: #7A5C2E; }
+  .metric-lbl  { font-size: 0.85rem; color: #555; margin-top: 2px; }
+  .section-hdr { font-size: 1.1rem; font-weight: 600; color: #7A5C2E;
+                 border-bottom: 2px solid #F0E2C8; padding-bottom: 4px; margin-bottom: 12px; }
+  [data-testid="stSidebar"] { background: #A6192E; }
   [data-testid="stSidebar"] label, [data-testid="stSidebar"] .st-emotion-cache-16idsys p
-    { color: #cde; }
+    { color: #fce; }
+  .partner-banner {
+    background: linear-gradient(135deg, #7A5C2E 0%, #A4804A 60%, #D4A568 100%);
+    border-radius: 12px; padding: 28px 36px; margin-bottom: 24px; color: white;
+  }
+  .partner-banner h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 4px 0; color: white; }
+  .partner-banner p  { font-size: 0.95rem; margin: 0; opacity: 0.85; }
+  .partner-kpi {
+    background: white; border-radius: 10px; padding: 20px 18px; text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08); border-top: 4px solid #A4804A;
+  }
+  .partner-kpi-val { font-size: 2.1rem; font-weight: 800; color: #7A5C2E; }
+  .partner-kpi-lbl { font-size: 0.8rem; color: #777; text-transform: uppercase;
+                     letter-spacing: 0.05em; margin-top: 4px; }
+  .highlight-box {
+    background: #fdf6ed; border-left: 4px solid #A4804A; border-radius: 6px;
+    padding: 14px 18px; margin-bottom: 10px;
+  }
+  .highlight-box b { color: #7A5C2E; }
+  .benchmark-better { color: #2D6A3F; font-weight: 700; }
+  .benchmark-worse  { color: #C8102E; font-weight: 700; }
   .spark-table {
     width: 100%; border-collapse: collapse; font-family: 'Calibri', sans-serif;
     font-size: 13px;
   }
   .spark-table th {
-    background: #1B4F72; color: white; padding: 8px 12px;
+    background: #7A5C2E; color: white; padding: 8px 12px;
     text-align: center; font-weight: 600; white-space: nowrap;
-    border: 1px solid #144060;
+    border: 1px solid #5a4020;
   }
   .spark-table th.left { text-align: left; }
   .spark-table td {
-    padding: 5px 10px; border: 1px solid #E8EEF4;
+    padding: 5px 10px; border: 1px solid #EEE5D8;
     vertical-align: middle; background: white;
   }
-  .spark-table tr:nth-child(even) td { background: #F7FAFD; }
-  .spark-table tr:hover td { background: #EBF4FB; }
+  .spark-table tr:nth-child(even) td { background: #FDF6ED; }
+  .spark-table tr:hover td { background: #F5EAD8; }
   .spark-table td.group-label {
-    font-weight: 600; color: #1B4F72; white-space: nowrap;
-    border-left: 3px solid #2E86C1;
+    font-weight: 600; color: #7A5C2E; white-space: nowrap;
+    border-left: 3px solid #A4804A;
   }
   .spark-table td.num { text-align: center; color: #555; font-size: 12px; }
   .spark-table td.spark { text-align: center; padding: 4px 8px; }
@@ -78,16 +105,22 @@ st.markdown("""
   .line-ref { width:22px; height:2px; background:#BBBBBB;
               display:inline-block; border-top: 2px dashed #BBBBBB; }
   .spark-section-label {
-    font-size: 1rem; font-weight: 700; color: #1B4F72;
-    background: #EBF4FB; padding: 6px 14px; border-radius: 6px;
+    font-size: 1rem; font-weight: 700; color: #7A5C2E;
+    background: #FDF6ED; padding: 6px 14px; border-radius: 6px;
     margin: 16px 0 8px 0; display: inline-block;
   }
 </style>
 """, unsafe_allow_html=True)
 
 # ── Palette ───────────────────────────────────────────────────────────────────
-PAL = ["#1B4F72","#2E86C1","#85C1E9","#D5E8F0",
-       "#F39C12","#E74C3C","#27AE60","#8E44AD"]
+PAL = ["#A4804A",  # 0: NU Gold (primary)
+       "#D4A568",  # 1: Medium Gold
+       "#7A5C2E",  # 2: Dark Gold / Walnut
+       "#F0E2C8",  # 3: Pale Gold (light fill)
+       "#C8A882",  # 4: Warm Tan / Sand
+       "#545454",  # 5: Dark Gray
+       "#C8102E",  # 6: NU Red (accent only)
+       "#9E9E9E"]  # 7: Mid Gray
 
 # ── Metric config ─────────────────────────────────────────────────────────────
 METRICS = {
@@ -129,27 +162,58 @@ df_raw = load_data()
 
 # ── Sidebar filters ───────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 📊 Analytical LEAP")
+    st.image("The Roux Institute_RGB_Monogram_RGB_NURed+B.png", width=140)
+    st.markdown("## Roux Institute Custom Learning Feedback Dashboard")
     st.markdown("### Filters")
 
-    metric_label = st.selectbox("Primary Metric", list(METRICS.keys()))
+    metric_label = st.selectbox("Primary Metric", list(METRICS.keys()), key="metric_sel")
     metric_col   = METRICS[metric_label]
 
-    persona  = st.selectbox("Persona",     ["All"] + sorted(df_raw["persona"].dropna().unique()))
-    level    = st.selectbox("Level",       ["All"] + sorted(df_raw["level"].dropna().unique()))
-    vertical = st.selectbox("Org Vertical",["All"] + sorted(df_raw["org_vertical"].dropna().unique()))
-    run_type = st.selectbox("Run Type",    ["All", "First Run", "Repeat Run"])
-    org      = st.selectbox("Organization",["All"] + sorted(df_raw["organization"].dropna().unique()))
-    course   = st.selectbox("Course",      ["All"] + sorted(df_raw["course_title"].dropna().unique()))
+    # Date range slider
+    months_all = sorted(df_raw["calendar_month"].dropna().unique())
+    date_start, date_end = st.select_slider(
+        "Date Range",
+        options=months_all,
+        value=(months_all[0], months_all[-1]),
+        key="date_range"
+    )
+
+    # Cascading multiselects — each selection narrows the options below it
+    pool = df_raw[(df_raw["calendar_month"] >= date_start) &
+                  (df_raw["calendar_month"] <= date_end)].copy()
+
+    persona  = st.multiselect("Persona",      sorted(pool["persona"].dropna().unique()),        placeholder="All", key="ms_persona")
+    if persona:  pool = pool[pool["persona"].isin(persona)]
+
+    level    = st.multiselect("Level",        sorted(pool["level"].dropna().unique()),           placeholder="All", key="ms_level")
+    if level:    pool = pool[pool["level"].isin(level)]
+
+    vertical = st.multiselect("Org Vertical", sorted(pool["org_vertical"].dropna().unique()),    placeholder="All", key="ms_vertical")
+    if vertical: pool = pool[pool["org_vertical"].isin(vertical)]
+
+    run_type = st.multiselect("Run Type",     sorted(pool["first_run_label"].dropna().unique()), placeholder="All", key="ms_run_type")
+    if run_type: pool = pool[pool["first_run_label"].isin(run_type)]
+
+    org      = st.multiselect("Organization", sorted(pool["organization"].dropna().unique()),    placeholder="All", key="ms_org")
+    if org:      pool = pool[pool["organization"].isin(org)]
+
+    course   = st.multiselect("Course",       sorted(pool["course_title"].dropna().unique()),    placeholder="All", key="ms_course")
+    if course:   pool = pool[pool["course_title"].isin(course)]
+
+    st.divider()
+    if st.button("🔄 Reset All Filters", use_container_width=True):
+        for k in ["metric_sel", "date_range", "ms_persona", "ms_level",
+                  "ms_vertical", "ms_run_type", "ms_org", "ms_course"]:
+            st.session_state.pop(k, None)
+        st.rerun()
 
 # ── Apply filters ─────────────────────────────────────────────────────────────
-df = df_raw.copy()
-if persona  != "All": df = df[df["persona"]       == persona]
-if level    != "All": df = df[df["level"]          == level]
-if vertical != "All": df = df[df["org_vertical"]   == vertical]
-if run_type != "All": df = df[df["first_run_label"] == run_type]
-if org      != "All": df = df[df["organization"]   == org]
-if course   != "All": df = df[df["course_title"]   == course]
+df = pool
+
+# ── Guard: empty filtered dataset ─────────────────────────────────────────────
+if df.empty:
+    st.warning("No data matches the current filters. Adjust the sidebar selections to continue.")
+    st.stop()
 
 # ── Navigation tabs ───────────────────────────────────────────────────────────
 tabs = st.tabs([
@@ -160,7 +224,8 @@ tabs = st.tabs([
     "📈 Trends",
     "🔬 Statistical Tests",
     "✦ Sparklines",
-    "📋 Raw Data"
+    "📋 Raw Data",
+    "🤝 Partner Report",
 ])
 
 # ════════════════════════════════════════════════════════════════════════
@@ -282,7 +347,7 @@ with tabs[1]:
         x=list(METRICS.keys()),
         y=heat["course_title"],
         z=z_vals,
-        colorscale=[[0,"#D5E8F0"],[0.5,"#2E86C1"],[1,"#1B4F72"]],
+        colorscale=[[0,"#F0E2C8"],[0.5,"#A4804A"],[1,"#7A5C2E"]],
         zmin=1, zmax=5,
         text=z_vals, texttemplate="%{text}"
     ))
@@ -521,7 +586,7 @@ with tabs[5]:
         cm = corr_df.corr(numeric_only=True).round(2)
         fig = go.Figure(go.Heatmap(
             x=cm.columns, y=cm.index, z=cm.values,
-            colorscale=[[0,"#D5E8F0"],[0.5,"white"],[1,"#1B4F72"]],
+            colorscale=[[0,"#7A5C2E"],[0.5,"white"],[1,"#A4804A"]],
             zmin=-1, zmax=1,
             text=cm.values.round(2), texttemplate="%{text}"
         ))
@@ -813,7 +878,7 @@ with tabs[6]:
             </tr>
           </thead>
           <tbody>
-            <tr style="border-top:2px solid #2E86C1;">
+            <tr style="border-top:2px solid #A4804A;">
               <td class="group-label" style="color:#888;font-weight:400;
                   font-style:italic;border-left:3px solid #BBBBBB;">
                 ◈ Overall Benchmark
@@ -826,7 +891,7 @@ with tabs[6]:
           </tbody>
         </table>
         """
-        return html
+        return html.strip()
 
     # ── Tab UI ────────────────────────────────────────────────────────────
     st.markdown(
@@ -898,3 +963,219 @@ with tabs[7]:
         file_name="leap_filtered.csv",
         mime="text/csv"
     )
+
+# ════════════════════════════════════════════════════════════════════════
+# TAB 9: PARTNER REPORT
+# ════════════════════════════════════════════════════════════════════════
+with tabs[8]:
+
+    all_orgs = sorted(df_raw["organization"].dropna().unique())
+    selected_partner = st.selectbox(
+        "Select Partner Organization", all_orgs, key="partner_org"
+    )
+
+    p_df = df_raw[
+        (df_raw["organization"] == selected_partner) &
+        (df_raw["calendar_month"] >= date_start) &
+        (df_raw["calendar_month"] <= date_end)
+    ].copy()
+
+    bench_df = df_raw[
+        (df_raw["calendar_month"] >= date_start) &
+        (df_raw["calendar_month"] <= date_end)
+    ].copy()
+
+    if p_df.empty:
+        st.warning(f"No data found for {selected_partner} in the selected date range.")
+    else:
+        n_courses   = p_df["course_title"].nunique()
+        n_learners  = int(p_df["total_learners"].sum())
+        n_sections  = len(p_df)
+        p_rr        = wtd_mean(p_df["response_pct"], p_df["total_learners"])
+        overall_sat = {lbl: wtd_mean(p_df[col], p_df["responses"])
+                       for lbl, col in METRICS.items()}
+        avg_sat     = np.nanmean([v for v in overall_sat.values() if not np.isnan(v)])
+        date_range_label = f"{date_start} – {date_end}"
+
+        st.markdown(f"""
+        <div class="partner-banner">
+          <h1>{selected_partner}</h1>
+          <p>Roux Custom Learning &nbsp;|&nbsp; Learner Experience Report &nbsp;|&nbsp; {date_range_label}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        k1, k2, k3, k4, k5 = st.columns(5)
+        kpis = [
+            (f"{n_courses}",       "Courses Delivered"),
+            (f"{n_sections}",      "Sections Completed"),
+            (f"{n_learners:,}",    "Learners Reached"),
+            (f"{avg_sat:.2f} / 5", "Avg Satisfaction"),
+            (f"{p_rr*100:.1f}%",   "Feedback Response Rate"),
+        ]
+        for col, (val, lbl) in zip([k1, k2, k3, k4, k5], kpis):
+            with col:
+                st.markdown(
+                    f'<div class="partner-kpi">'
+                    f'<div class="partner-kpi-val">{val}</div>'
+                    f'<div class="partner-kpi-lbl">{lbl}</div>'
+                    f'</div>', unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<div class="section-hdr">How You Compare — vs. Roux Portfolio Benchmark</div>',
+                    unsafe_allow_html=True)
+
+        bench_vals = {lbl: wtd_mean(bench_df[col], bench_df["responses"])
+                      for lbl, col in METRICS.items()}
+
+        bm_rows = []
+        for lbl in METRICS:
+            pv, bv = overall_sat[lbl], bench_vals[lbl]
+            if not (np.isnan(pv) or np.isnan(bv)):
+                diff  = pv - bv
+                arrow = "▲" if diff >= 0 else "▼"
+                css   = "benchmark-better" if diff >= 0 else "benchmark-worse"
+                bm_rows.append({"Metric": lbl, "Your Score": f"{pv:.2f}",
+                                 "Portfolio Avg": f"{bv:.2f}",
+                                 "Difference": f'<span class="{css}">{arrow} {abs(diff):.2f}</span>'})
+
+        bc1, bc2 = st.columns([1, 2])
+        with bc1:
+            html_rows = "".join(
+                f"<tr><td>{r['Metric']}</td><td>{r['Your Score']}</td>"
+                f"<td>{r['Portfolio Avg']}</td><td>{r['Difference']}</td></tr>"
+                for _, r in pd.DataFrame(bm_rows).iterrows()
+            )
+            st.markdown(f"""<table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+  <thead><tr style="background:#7A5C2E;color:white;">
+    <th style="padding:8px;text-align:left">Metric</th>
+    <th style="padding:8px;text-align:center">Your Score</th>
+    <th style="padding:8px;text-align:center">Portfolio Avg</th>
+    <th style="padding:8px;text-align:center">vs. Benchmark</th>
+  </tr></thead>
+  <tbody>{html_rows}</tbody>
+</table>""", unsafe_allow_html=True)
+
+        with bc2:
+            fig_bm = go.Figure()
+            fig_bm.add_trace(go.Bar(
+                name="Portfolio Avg", x=list(METRICS.keys()),
+                y=[bench_vals[l] for l in METRICS],
+                marker_color=PAL[3], opacity=0.85))
+            fig_bm.add_trace(go.Bar(
+                name=selected_partner, x=list(METRICS.keys()),
+                y=[overall_sat[l] for l in METRICS],
+                marker_color=PAL[0]))
+            fig_bm.update_layout(
+                barmode="group", height=260,
+                yaxis=dict(range=[1, 5.5], title="Score (1–5)"),
+                xaxis_title="", margin=dict(t=10, b=10),
+                legend=dict(orientation="h", y=-0.25))
+            st.plotly_chart(fig_bm, use_container_width=True)
+
+        st.divider()
+        st.markdown('<div class="section-hdr">Course Performance Summary</div>',
+                    unsafe_allow_html=True)
+
+        course_summary = (
+            p_df.groupby("course_title")
+              .apply(lambda g: pd.Series({
+                  "Sections":          len(g),
+                  "Learners":          int(g["total_learners"].sum()),
+                  "Response Rate":     wtd_mean(g["response_pct"], g["total_learners"]),
+                  "Recommend":         wtd_mean(g[METRICS["Recommend"]], g["responses"]),
+                  "Instructor":        wtd_mean(g[METRICS["Instructor Effectiveness"]], g["responses"]),
+                  "Skill Acquisition": wtd_mean(g[METRICS["Skill Acquisition"]], g["responses"]),
+                  "Job Relevance":     wtd_mean(g[METRICS["Job Relevance"]], g["responses"]),
+              }))
+              .reset_index().rename(columns={"course_title": "Course"})
+        )
+        course_summary["Avg Score"] = course_summary[
+            ["Recommend","Instructor","Skill Acquisition","Job Relevance"]].mean(axis=1)
+        course_summary = course_summary.sort_values("Avg Score", ascending=False)
+        for c in ["Response Rate","Recommend","Instructor","Skill Acquisition","Job Relevance","Avg Score"]:
+            course_summary[c] = course_summary[c].round(2)
+        course_summary["Response Rate"] = course_summary["Response Rate"].apply(
+            lambda x: f"{x*100:.1f}%" if pd.notna(x) else "—")
+
+        st.dataframe(
+            course_summary.set_index("Course"), use_container_width=True,
+            column_config={
+                "Avg Score":         st.column_config.ProgressColumn("Avg Score", min_value=1, max_value=5, format="%.2f"),
+                "Recommend":         st.column_config.NumberColumn(format="%.2f"),
+                "Instructor":        st.column_config.NumberColumn(format="%.2f"),
+                "Skill Acquisition": st.column_config.NumberColumn(format="%.2f"),
+                "Job Relevance":     st.column_config.NumberColumn(format="%.2f"),
+            })
+
+        st.divider()
+        cl, cr = st.columns([3, 2])
+        with cl:
+            st.markdown('<div class="section-hdr">Satisfaction Heatmap</div>', unsafe_allow_html=True)
+            heat_p = (p_df.groupby("course_title")
+                          .apply(lambda g: pd.Series({
+                              lbl: wtd_mean(g[col], g["responses"])
+                              for lbl, col in METRICS.items()}))
+                          .reset_index()
+                          .dropna(how="all", subset=list(METRICS.keys())))
+            z_p = heat_p[list(METRICS.keys())].values.round(2)
+            fig_h = go.Figure(go.Heatmap(
+                x=list(METRICS.keys()), y=heat_p["course_title"], z=z_p,
+                colorscale=[[0,"#F0E2C8"],[0.5,"#A4804A"],[1,"#7A5C2E"]],
+                zmin=1, zmax=5, text=z_p, texttemplate="%{text}"))
+            fig_h.update_layout(height=max(250, len(heat_p)*34),
+                                margin=dict(l=300, t=10, b=60))
+            st.plotly_chart(fig_h, use_container_width=True)
+
+        with cr:
+            st.markdown('<div class="section-hdr">Satisfaction Over Time</div>', unsafe_allow_html=True)
+            trend_p = (p_df.groupby("calendar_month_dt")
+                           .apply(lambda g: pd.Series({
+                               lbl: wtd_mean(g[col], g["responses"])
+                               for lbl, col in METRICS.items()}))
+                           .reset_index()
+                           .dropna(how="all", subset=list(METRICS.keys())))
+            fig_t = go.Figure()
+            for i, lbl in enumerate(METRICS):
+                fig_t.add_trace(go.Scatter(
+                    x=trend_p["calendar_month_dt"], y=trend_p[lbl],
+                    mode="lines+markers", name=lbl,
+                    line=dict(color=PAL[i], width=2)))
+            fig_t.update_layout(
+                height=max(250, len(heat_p)*34),
+                yaxis=dict(range=[1, 5.5], title="Score"),
+                xaxis_title="Month",
+                legend=dict(orientation="h", y=-0.3),
+                margin=dict(t=10, b=60))
+            st.plotly_chart(fig_t, use_container_width=True)
+
+        st.divider()
+        st.markdown('<div class="section-hdr">Highlights</div>', unsafe_allow_html=True)
+        h1, h2, h3 = st.columns(3)
+        with h1:
+            top = course_summary.iloc[0]
+            st.markdown(
+                f'<div class="highlight-box"><b>Top Rated Course</b><br>{top["Course"]}<br>'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#7A5C2E">'
+                f'{top["Avg Score"]:.2f} / 5</span></div>', unsafe_allow_html=True)
+        with h2:
+            best_m = max(overall_sat, key=lambda k: overall_sat[k] if not np.isnan(overall_sat[k]) else 0)
+            st.markdown(
+                f'<div class="highlight-box"><b>Strongest Dimension</b><br>{best_m}<br>'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#7A5C2E">'
+                f'{overall_sat[best_m]:.2f} / 5</span></div>', unsafe_allow_html=True)
+        with h3:
+            st.markdown(
+                f'<div class="highlight-box"><b>Learner Engagement</b><br>Feedback response rate<br>'
+                f'<span style="font-size:1.4rem;font-weight:700;color:#7A5C2E">'
+                f'{p_rr*100:.1f}%</span></div>', unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        dl_cols = ["course_title","calendar_month","persona","level",
+                   "responses","total_learners","response_pct"] + METRIC_COLS
+        dl_df = p_df[[c for c in dl_cols if c in p_df.columns]].copy().round(3)
+        st.download_button(
+            f"⬇️ Download {selected_partner} Data",
+            data=dl_df.to_csv(index=False).encode(),
+            file_name=f"leap_{selected_partner.replace(' ','_')}.csv",
+            mime="text/csv"
+        )
